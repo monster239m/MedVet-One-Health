@@ -1,6 +1,6 @@
 # MedVet Platform Prototype
 
-Live Deployment: https://medvet-platform.vercel.app/
+Live Deployment: [https://medvet-platform.vercel.app/](https://medvetonehealth-7hjl28nbv-monster239ms-projects.vercel.app/)
 
 ## Project Overview
 
