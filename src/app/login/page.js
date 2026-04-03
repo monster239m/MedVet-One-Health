@@ -18,15 +18,13 @@ export default function LoginPage() {
     setError('');
     setLoading(true);
     
-    setTimeout(() => {
-      const result = login(email, password);
-      if (result.success) {
-        router.push(getDashboardPath(result.user.role));
-      } else {
-        setError(result.error);
-      }
-      setLoading(false);
-    }, 800);
+    const result = await login(email, password);
+    if (result.success) {
+      router.push(getDashboardPath(result.user.role));
+    } else {
+      setError(result.error);
+    }
+    setLoading(false);
   };
 
   const quickLogin = (email, password) => {

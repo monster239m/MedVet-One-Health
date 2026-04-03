@@ -1,6 +1,6 @@
 'use client';
 import { createContext, useContext, useState, useEffect } from 'react';
-import { MOCK_USERS, initializeMockData } from '@/data/mockData';
+import { initializeMockData } from '@/data/mockData';
 
 const AuthContext = createContext(null);
 
@@ -17,17 +17,50 @@ export function AuthProvider({ children }) {
     setLoading(false);
   }, []);
 
-  const login = (email, password) => {
-    const allUsers = [...MOCK_USERS.patients, ...MOCK_USERS.doctors, ...MOCK_USERS.admins];
-    const found = allUsers.find(u => u.email === email && u.password === password);
-    if (found) {
-      const userData = { ...found };
-      delete userData.password;
-      setUser(userData);
-      localStorage.setItem('medvet_current_user', JSON.stringify(userData));
-      return { success: true, user: userData };
+  const login = async (email, password) => {
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setUser(data.user);
+        localStorage.setItem('medvet_current_user', JSON.stringify(data.user));
+        return { success: true, user: data.user };
+      } else {
+        return { success: false, error: data.error };
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      return { success: false, error: 'Network error. Please try again.' };
     }
-    return { success: false, error: 'Invalid email or password' };
+  };
+
+  const register = async (userData) => {
+    try {
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(userData),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setUser(data.user);
+        localStorage.setItem('medvet_current_user', JSON.stringify(data.user));
+        return { success: true, user: data.user };
+      } else {
+        return { success: false, error: data.error };
+      }
+    } catch (error) {
+      console.error('Register error:', error);
+      return { success: false, error: 'Network error. Please try again.' };
+    }
   };
 
   const logout = () => {
@@ -45,7 +78,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout, getDashboardPath }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout, getDashboardPath }}>
       {children}
     </AuthContext.Provider>
   );
